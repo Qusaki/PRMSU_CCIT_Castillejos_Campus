@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Helvetica Neue", Arial, sans-serif;
+  
+  --color-prmsu-maroon: #166534; /* Transformed into sleek green */
+  --color-prmsu-gold: #FFCC00;
+  --color-prmsu-dark: #1A1A1A;
+  --color-prmsu-light: #F8F9FA;
+  --color-text-light: #666666;
+  --color-white: #FFFFFF;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-prmsu-light);
+  color: var(--color-prmsu-dark);
+}
