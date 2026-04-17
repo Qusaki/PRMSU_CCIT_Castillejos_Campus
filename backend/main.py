@@ -10,7 +10,7 @@ from routes.auth import router as auth_router
 def ping_server():
     try:
         # Pings the health route to keep the server awake
-        urllib.request.urlopen("http://127.0.0.1:8000/api/health")
+        urllib.request.urlopen("https://prmsu-ccit-castillejos-campus.onrender.com/api/health")
         print("Keep-alive ping successful")
     except Exception as e:
         print(f"Keep-alive ping failed: {e}")
