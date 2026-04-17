@@ -6,11 +6,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router as api_router
 from routes.auth import router as auth_router
+from routes.gallery import router as gallery_router
 
 def ping_server():
     try:
-        # Pings the health route to keep the server awake
-        urllib.request.urlopen("https://prmsu-ccit-castillejos-campus.onrender.com/api/health")
+        # Pings the refresh route to keep the server and database awake natively
+        urllib.request.urlopen("https://prmsu-ccit-castillejos-campus.onrender.com/api/refresh-db")
         print("Keep-alive ping successful")
     except Exception as e:
         print(f"Keep-alive ping failed: {e}")
@@ -46,6 +47,7 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api")
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
+app.include_router(gallery_router, prefix="/api/gallery", tags=["gallery"])
 
 @app.get("/")
 def root():
