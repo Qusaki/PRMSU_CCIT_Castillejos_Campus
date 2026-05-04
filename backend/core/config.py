@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_key: str
     supabase_bucket: str = "gallery"
+    supabase_events_bucket: str = "events"
 
     class Config:
         env_file = ".env"

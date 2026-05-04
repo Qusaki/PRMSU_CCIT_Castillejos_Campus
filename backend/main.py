@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router as api_router
 from routes.auth import router as auth_router
 from routes.gallery import router as gallery_router
+from routes.events import router as events_router
 
 def ping_render_health():
     try:
@@ -66,6 +67,7 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api")
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(gallery_router, prefix="/api/gallery", tags=["gallery"])
+app.include_router(events_router, prefix="/api/events", tags=["events"])
 
 @app.get("/")
 def root():
