@@ -8,7 +8,7 @@ from core.database import get_db
 from core.config import settings
 from core.security import verify_password, create_access_token, get_password_hash
 from models.admin import Admin
-from schemas.admin import AdminResponse, AdminCreate
+from schemas.admin import AdminResponse, AdminCreate, AdminUpdate
 from schemas.token import Token, TokenData
 
 router = APIRouter()
@@ -55,6 +55,33 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
 
 @router.get("/me", response_model=AdminResponse)
 def read_admins_me(current_admin: Admin = Depends(get_current_admin)):
+    return current_admin
+
+@router.put("/me", response_model=AdminResponse)
+def update_admin_me(
+    admin_update: AdminUpdate,
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin)
+):
+    if admin_update.username and admin_update.username != current_admin.username:
+        # Check if username exists
+        existing_username = db.query(Admin).filter(Admin.username == admin_update.username).first()
+        if existing_username:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        current_admin.username = admin_update.username
+        
+    if admin_update.email and admin_update.email != current_admin.email:
+        # Check if email exists
+        existing_email = db.query(Admin).filter(Admin.email == admin_update.email).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already taken")
+        current_admin.email = admin_update.email
+        
+    if admin_update.password:
+        current_admin.hashed_password = get_password_hash(admin_update.password)
+        
+    db.commit()
+    db.refresh(current_admin)
     return current_admin
 
 # Create new admin (Protected route: only logged-in admins can create another admin)

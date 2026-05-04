@@ -34,8 +34,8 @@ async def supabase_keep_alive_task():
     await asyncio.sleep(60)
     await asyncio.to_thread(ping_supabase_db)
     while True:
-        # Wait 6 days before running again
-        await asyncio.sleep(6 * 24 * 60 * 60)
+        # Wait 1 day before running again
+        await asyncio.sleep(1 * 24 * 60 * 60)
         await asyncio.to_thread(ping_supabase_db)
 
 @asynccontextmanager

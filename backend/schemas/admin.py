@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 class AdminBase(BaseModel):
     username: str
@@ -6,6 +7,11 @@ class AdminBase(BaseModel):
 
 class AdminCreate(AdminBase):
     password: str
+
+class AdminUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
 
 class AdminResponse(AdminBase):
     id: int
