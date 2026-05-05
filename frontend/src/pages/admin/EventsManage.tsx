@@ -303,13 +303,18 @@ export default function EventsManage() {
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="p-5 flex flex-col sm:flex-row gap-4">
-                {/* Thumbnail */}
+                {/* Images */}
                 {event.image_urls && event.image_urls.length > 0 && (
-                  <img
-                    src={event.image_urls[0]}
-                    alt={event.title}
-                    className="w-full sm:w-32 h-32 rounded-lg object-cover border border-gray-100 flex-shrink-0"
-                  />
+                  <div className="flex flex-wrap gap-2 flex-shrink-0">
+                    {event.image_urls.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt={`${event.title} ${i + 1}`}
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-contain bg-gray-50 border border-gray-100"
+                      />
+                    ))}
+                  </div>
                 )}
 
                 {/* Details */}

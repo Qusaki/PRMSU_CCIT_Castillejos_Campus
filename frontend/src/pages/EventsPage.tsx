@@ -27,20 +27,20 @@ function EventPageSlider({ images, title }: { images: string[]; title: string })
 
   if (images.length === 1) {
     return (
-      <div className="h-56 sm:h-64 overflow-hidden rounded-xl">
-        <img src={images[0]} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="h-56 sm:h-64 overflow-hidden rounded-xl bg-gray-100">
+        <img src={images[0]} alt={title} className="w-full h-full object-contain transition-transform duration-500" />
       </div>
     );
   }
 
   return (
-    <div className="h-56 sm:h-64 relative overflow-hidden rounded-xl">
+    <div className="h-56 sm:h-64 relative overflow-hidden rounded-xl bg-gray-100">
       {images.map((url, i) => (
         <img
           key={i}
           src={url}
           alt={`${title} ${i + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ease-in-out ${
             i === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         />

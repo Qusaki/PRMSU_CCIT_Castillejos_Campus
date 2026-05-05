@@ -34,20 +34,20 @@ function EventImageSlider({ images, title, heightClass = 'h-64 md:h-80' }: { ima
 
   if (images.length === 1) {
     return (
-      <div className={`${heightClass} overflow-hidden rounded-xl`}>
-        <img src={images[0]} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className={`${heightClass} overflow-hidden rounded-xl bg-gray-100`}>
+        <img src={images[0]} alt={title} className="w-full h-full object-contain transition-transform duration-500" />
       </div>
     );
   }
 
   return (
-    <div className={`${heightClass} relative overflow-hidden rounded-xl`}>
+    <div className={`${heightClass} relative overflow-hidden rounded-xl bg-gray-100`}>
       {images.map((url, i) => (
         <img
           key={i}
           src={url}
           alt={`${title} ${i + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ease-in-out ${
             i === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         />
@@ -523,10 +523,10 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.8, delay: idx * 0.1 }}
-                  className={`group grid lg:grid-cols-2 gap-8 lg:gap-12 items-center ${idx % 2 !== 0 ? 'lg:direction-rtl' : ''}`}
+                  className="group grid lg:grid-cols-2 gap-8 lg:gap-12 items-center"
                 >
-                  {/* Image — alternates left/right on desktop */}
-                  <div className={`${idx % 2 !== 0 ? 'lg:order-2' : ''}`}>
+                  {/* Image — always on the left */}
+                  <div>
                     {event.image_urls && event.image_urls.length > 0 ? (
                       <EventImageSlider images={event.image_urls} title={event.title} heightClass="h-72 sm:h-80 md:h-96" />
                     ) : (
@@ -536,8 +536,8 @@ export default function LandingPage() {
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className={`${idx % 2 !== 0 ? 'lg:order-1' : ''} flex flex-col justify-center`}>
+                  {/* Content — always on the right */}
+                  <div className="flex flex-col justify-center">
                     <div className="inline-flex items-center gap-2 text-prmsu-maroon text-sm font-bold uppercase tracking-wider mb-4">
                       <Calendar className="w-4 h-4" />
                       <span>Campus Event</span>
