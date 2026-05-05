@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Calendar, Plus, Trash2, X, MapPin, Clock, Loader2, ImagePlus, AlertCircle } from 'lucide-react';
+import { Calendar, Plus, Trash2, X, MapPin, Clock, Loader2, ImagePlus, AlertCircle, Edit2 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -23,6 +23,8 @@ export default function EventsManage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -64,14 +66,12 @@ export default function EventsManage() {
       setImages((prev) => [...prev, ...newFiles]);
       setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
-    // Reset the input so the same file can be re-selected if needed
     e.target.value = '';
   };
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => {
-      // Revoke the URL to free memory
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
@@ -82,12 +82,26 @@ export default function EventsManage() {
     setDescription('');
     setEventDate('');
     setVenue('');
-    // Revoke all preview URLs
     imagePreviews.forEach((url) => URL.revokeObjectURL(url));
     setImages([]);
     setImagePreviews([]);
     setError('');
     setShowForm(false);
+    setIsEditing(false);
+    setEditId(null);
+  };
+
+  const handleEdit = (event: EventItem) => {
+    setTitle(event.title);
+    setDescription(event.description);
+    // Format date for input yyyy-mm-dd
+    const date = new Date(event.event_date);
+    setEventDate(date.toISOString().split('T')[0]);
+    setVenue(event.venue);
+    setIsEditing(true);
+    setEditId(event.id);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,26 +114,44 @@ export default function EventsManage() {
     }
 
     setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('event_date', new Date(eventDate + 'T00:00:00').toISOString());
-    formData.append('venue', venue);
-
-    if (images.length > 0) {
-      for (let i = 0; i < images.length; i++) {
-        formData.append('images', images[i]);
-      }
-    }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/events/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      let res;
+      if (isEditing) {
+        // Send JSON for Update (matching existing backend PUT route)
+        res = await fetch(`${API_BASE_URL}/api/events/${editId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            description,
+            event_date: new Date(eventDate + 'T00:00:00').toISOString(),
+            venue,
+          }),
+        });
+      } else {
+        // Send FormData for Create (matching existing backend POST route)
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('event_date', new Date(eventDate + 'T00:00:00').toISOString());
+        formData.append('venue', venue);
+        if (images.length > 0) {
+          for (let i = 0; i < images.length; i++) {
+            formData.append('images', images[i]);
+          }
+        }
+        res = await fetch(`${API_BASE_URL}/api/events/`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+      }
 
       if (res.ok) {
         resetForm();
@@ -129,7 +161,7 @@ export default function EventsManage() {
         navigate('/admin/login');
       } else {
         const data = await res.json();
-        setError(data.detail || 'Failed to create event.');
+        setError(data.detail || `Failed to ${isEditing ? 'update' : 'create'} event.`);
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -139,6 +171,7 @@ export default function EventsManage() {
   };
 
   const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
     setDeleteId(id);
     try {
       const res = await fetch(`${API_BASE_URL}/api/events/${id}`, {
@@ -170,14 +203,13 @@ export default function EventsManage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 font-display">Events Management</h2>
-          <p className="text-gray-500 mt-1">Create, view, and delete campus events.</p>
+          <p className="text-gray-500 mt-1">Create, view, edit, and delete campus events.</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => isEditing ? resetForm() : setShowForm(!showForm)}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-prmsu-maroon text-white rounded-lg font-medium hover:opacity-90 transition-all shadow-sm"
         >
           {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
@@ -185,13 +217,14 @@ export default function EventsManage() {
         </button>
       </div>
 
-      {/* Create Form */}
       {showForm && (
         <form
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5"
         >
-          <h3 className="text-lg font-bold text-gray-900 border-b pb-3">New Event</h3>
+          <h3 className="text-lg font-bold text-gray-900 border-b pb-3">
+            {isEditing ? 'Edit Event (Text Only)' : 'New Event'}
+          </h3>
 
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm">
@@ -244,51 +277,61 @@ export default function EventsManage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Images (optional)</label>
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-prmsu-maroon/50 hover:bg-gray-50 transition-all">
-              <ImagePlus className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-sm text-gray-500">Click to upload images</span>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-            {imagePreviews.length > 0 && (
-              <div className="flex gap-3 mt-3 flex-wrap">
-                {imagePreviews.map((src, i) => (
-                  <div key={i} className="relative group/img">
-                    <img src={src} alt={`Preview ${i}`} className="w-20 h-20 rounded-lg object-cover border border-gray-200 shadow-sm" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {!isEditing && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Images (optional)</label>
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-prmsu-maroon/50 hover:bg-gray-50 transition-all">
+                <ImagePlus className="w-8 h-8 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-500">Click to upload images</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+              {imagePreviews.length > 0 && (
+                <div className="flex gap-3 mt-3 flex-wrap">
+                  {imagePreviews.map((src, i) => (
+                    <div key={i} className="relative group/img">
+                      <img src={src} alt={`Preview ${i}`} className="w-20 h-20 rounded-lg object-cover border border-gray-200 shadow-sm" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-2 gap-3">
+            {isEditing && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </button>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-prmsu-maroon text-white rounded-lg font-medium hover:opacity-90 transition-all shadow-sm disabled:opacity-50"
             >
-              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
-              {isSubmitting ? 'Creating...' : 'Create Event'}
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (isEditing ? <Edit2 className="w-4 h-4" /> : <Calendar className="w-4 h-4" />)}
+              {isSubmitting ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Event' : 'Create Event')}
             </button>
           </div>
         </form>
       )}
 
-      {/* Events List */}
       {events.length === 0 ? (
         <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
           <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -303,10 +346,8 @@ export default function EventsManage() {
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="p-5 flex flex-col sm:flex-row gap-4">
-                {/* Stacked Images */}
                 {event.image_urls && event.image_urls.length > 0 && (
                   <div className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32">
-                    {/* Background cards (show up to 2 behind) */}
                     {event.image_urls.length >= 3 && (
                       <div className="absolute top-2 left-2 w-full h-full rounded-lg bg-gray-200 border border-gray-300 rotate-3"></div>
                     )}
@@ -315,11 +356,9 @@ export default function EventsManage() {
                         <img src={event.image_urls[1]} alt="" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    {/* Front card */}
                     <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-white shadow-md">
                       <img src={event.image_urls[0]} alt={event.title} className="w-full h-full object-cover" />
                     </div>
-                    {/* Count badge */}
                     {event.image_urls.length > 1 && (
                       <span className="absolute -bottom-1.5 -right-1.5 bg-prmsu-maroon text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
                         {event.image_urls.length}
@@ -328,7 +367,6 @@ export default function EventsManage() {
                   </div>
                 )}
 
-                {/* Details */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-gray-900 truncate">{event.title}</h3>
                   <p className="text-gray-500 text-sm mt-1 line-clamp-2">{event.description}</p>
@@ -348,8 +386,14 @@ export default function EventsManage() {
                   </div>
                 </div>
 
-                {/* Delete */}
-                <div className="flex-shrink-0 flex items-start">
+                <div className="flex-shrink-0 flex items-start gap-2">
+                  <button
+                    onClick={() => handleEdit(event)}
+                    className="p-2 text-gray-400 hover:text-prmsu-gold hover:bg-yellow-50 rounded-lg transition-colors"
+                    title="Edit event"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
                   <button
                     onClick={() => handleDelete(event.id)}
                     disabled={deleteId === event.id}
