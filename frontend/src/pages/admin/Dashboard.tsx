@@ -1,14 +1,50 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ShieldCheck, Users, Calendar, Image as ImageIcon } from 'lucide-react';
+import { ShieldCheck, Users, Calendar, Image as ImageIcon, Loader2 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [eventCount, setEventCount] = useState<number | null>(null);
+  const [galleryCount, setGalleryCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [eventsRes, galleryRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/events/`),
+          fetch(`${API_BASE_URL}/api/gallery/`),
+        ]);
+        if (eventsRes.ok) {
+          const events = await eventsRes.json();
+          setEventCount(events.length);
+        }
+        if (galleryRes.ok) {
+          const gallery = await galleryRes.json();
+          setGalleryCount(gallery.length);
+        }
+      } catch (err) {
+        console.error('Failed to fetch counts:', err);
+      }
+    };
+    fetchCounts();
+  }, []);
 
   const stats = [
     { title: 'Total Admins', value: '1', icon: <Users className="w-6 h-6 text-blue-500" /> },
-    { title: 'Upcoming Events', value: '0', icon: <Calendar className="w-6 h-6 text-green-500" /> },
-    { title: 'Gallery Images', value: '0', icon: <ImageIcon className="w-6 h-6 text-purple-500" /> },
+    {
+      title: 'Events',
+      value: eventCount !== null ? String(eventCount) : '...',
+      icon: <Calendar className="w-6 h-6 text-green-500" />,
+    },
+    {
+      title: 'Gallery Images',
+      value: galleryCount !== null ? String(galleryCount) : '...',
+      icon: <ImageIcon className="w-6 h-6 text-purple-500" />,
+    },
   ];
 
   return (
@@ -41,11 +77,17 @@ export default function Dashboard() {
       <div className="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 font-medium transition-colors">
+          <button
+            onClick={() => navigate('/admin/events')}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 font-medium transition-colors"
+          >
             <Calendar className="w-5 h-5" />
             Add New Event
           </button>
-          <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 font-medium transition-colors">
+          <button
+            onClick={() => navigate('/admin/gallery')}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 font-medium transition-colors"
+          >
             <ImageIcon className="w-5 h-5" />
             Upload Gallery Image
           </button>

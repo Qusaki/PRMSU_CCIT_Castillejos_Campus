@@ -8,6 +8,8 @@ import LandingPage from './pages/LandingPage';
 import AdminLayout from './components/admin/AdminLayout';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
+import EventsManage from './pages/admin/EventsManage';
+import GalleryManage from './pages/admin/GalleryManage';
 
 export default function App() {
   return (
@@ -22,9 +24,8 @@ export default function App() {
           
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
-            {/* Future routes for events and gallery can go here */}
-            {/* <Route path="events" element={<EventsManage />} /> */}
-            {/* <Route path="gallery" element={<GalleryManage />} /> */}
+            <Route path="events" element={<EventsManage />} />
+            <Route path="gallery" element={<GalleryManage />} />
           </Route>
         </Routes>
       </Router>
