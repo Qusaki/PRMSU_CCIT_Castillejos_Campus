@@ -31,7 +31,7 @@ export default function EventsManage() {
   const [description, setDescription] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [venue, setVenue] = useState('');
-  const [images, setImages] = useState<FileList | null>(null);
+  const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const fetchEvents = async () => {
@@ -54,16 +54,27 @@ export default function EventsManage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    setImages(files);
-    if (files) {
-      const previews: string[] = [];
+    if (files && files.length > 0) {
+      const newFiles: File[] = [];
+      const newPreviews: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        previews.push(URL.createObjectURL(files[i]));
+        newFiles.push(files[i]);
+        newPreviews.push(URL.createObjectURL(files[i]));
       }
-      setImagePreviews(previews);
-    } else {
-      setImagePreviews([]);
+      setImages((prev) => [...prev, ...newFiles]);
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
+    // Reset the input so the same file can be re-selected if needed
+    e.target.value = '';
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => {
+      // Revoke the URL to free memory
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const resetForm = () => {
@@ -71,7 +82,9 @@ export default function EventsManage() {
     setDescription('');
     setEventDate('');
     setVenue('');
-    setImages(null);
+    // Revoke all preview URLs
+    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    setImages([]);
     setImagePreviews([]);
     setError('');
     setShowForm(false);
@@ -90,10 +103,10 @@ export default function EventsManage() {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('event_date', new Date(eventDate).toISOString());
+    formData.append('event_date', new Date(eventDate + 'T00:00:00').toISOString());
     formData.append('venue', venue);
 
-    if (images) {
+    if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         formData.append('images', images[i]);
       }
@@ -211,9 +224,9 @@ export default function EventsManage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
             <input
-              type="datetime-local"
+              type="date"
               value={eventDate}
               onChange={(e) => setEventDate(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-prmsu-maroon/30 focus:border-prmsu-maroon outline-none transition-all"
@@ -247,7 +260,16 @@ export default function EventsManage() {
             {imagePreviews.length > 0 && (
               <div className="flex gap-3 mt-3 flex-wrap">
                 {imagePreviews.map((src, i) => (
-                  <img key={i} src={src} alt={`Preview ${i}`} className="w-20 h-20 rounded-lg object-cover border border-gray-200 shadow-sm" />
+                  <div key={i} className="relative group/img">
+                    <img src={src} alt={`Preview ${i}`} className="w-20 h-20 rounded-lg object-cover border border-gray-200 shadow-sm" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -301,8 +323,6 @@ export default function EventsManage() {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
                       })}
                     </span>
                     <span className="inline-flex items-center gap-1.5">
