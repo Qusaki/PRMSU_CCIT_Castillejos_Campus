@@ -28,12 +28,21 @@ def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = Depends
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except Exception:
-        raise credentials_exception
+    except Exception as e:
+        print(f"JWT Decode error: {repr(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Could not validate credentials: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
         
     admin = db.query(Admin).filter(Admin.username == token_data.username).first()
     if admin is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return admin
 
 @router.post("/login", response_model=Token)
