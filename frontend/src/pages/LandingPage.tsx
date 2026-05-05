@@ -102,7 +102,7 @@ export default function LandingPage() {
   const features = [
     { title: 'Modern Laboratories', value: 'State-of-the-art computer labs with high-speed internet and the latest software.' },
     { title: 'Expert Faculty', value: 'Learn from industry professionals and experienced academics committed to your success.' },
-    { title: 'Industry Connections', value: 'Strong partnerships with tech companies for internships and job placements.' },
+    { title: 'Campus Activities', value: 'CCIT is actively engaging in various campus activities, fostering a vibrant and inclusive community.' },
     { title: 'Research Opportunities', value: 'Engage in innovative research projects that solve real-world problems.' }
   ];
 
@@ -481,8 +481,8 @@ export default function LandingPage() {
             </div>
             <div className="relative pt-8 md:pt-0">
               <div className="grid grid-cols-2 gap-4">
-                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop" alt="Students coding" className="rounded-2xl h-64 object-cover w-full mt-12" />
-                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" alt="Collaboration" className="rounded-2xl h-64 object-cover w-full" />
+                <img src="/ccit_pics/saae.jpg" alt="CCIT Campus Activity" className="rounded-2xl h-64 object-cover w-full mt-12 shadow-xl" />
+                <img src="/ccit_pics/sasa.jpg" alt="CCIT Students" className="rounded-2xl h-64 object-cover w-full shadow-xl" />
               </div>
             </div>
           </div>
