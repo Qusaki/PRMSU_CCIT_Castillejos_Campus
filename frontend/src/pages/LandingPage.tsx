@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
+import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -18,6 +18,67 @@ interface GalleryItem {
   filename: string;
   file_url: string;
   created_at: string;
+}
+
+function EventImageSlider({ images, title }: { images: string[]; title: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  if (images.length === 1) {
+    return (
+      <div className="h-48 overflow-hidden">
+        <img src={images[0]} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      </div>
+    );
+  }
+
+  // 2+ images: sliding carousel
+  return (
+    <div className="h-48 relative overflow-hidden">
+      {images.map((url, i) => (
+        <img
+          key={i}
+          src={url}
+          alt={`${title} ${i + 1}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+            i === currentIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      ))}
+      {/* Navigation arrows */}
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev - 1 + images.length) % images.length); }}
+        className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-black/60"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev + 1) % images.length); }}
+        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-black/60"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+      {/* Dots */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={(e) => { e.stopPropagation(); setCurrentIndex(i); }}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              i === currentIndex ? 'bg-white scale-110' : 'bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function LandingPage() {
@@ -466,9 +527,7 @@ export default function LandingPage() {
                   className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
                   {event.image_urls && event.image_urls.length > 0 ? (
-                    <div className="h-48 overflow-hidden">
-                      <img src={event.image_urls[0]} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    </div>
+                    <EventImageSlider images={event.image_urls} title={event.title} />
                   ) : (
                     <div className="h-48 bg-gradient-to-br from-prmsu-maroon/10 to-prmsu-gold/10 flex items-center justify-center">
                       <Calendar className="w-12 h-12 text-prmsu-maroon/30" />
