@@ -114,7 +114,6 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-3 cursor-pointer group">
-              <img src="/logo/ccit_logo.png" alt="CCIT Logo" className="w-10 h-10 object-contain" />
               <div className="font-display font-extrabold text-lg tracking-tight text-prmsu-maroon transition-colors duration-300 group-hover:text-[#15803d]">
                 The Smart University
               </div>
