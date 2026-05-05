@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, MapPin, Clock } from 'lucide-react';
+import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, MapPin, MapPinned, Clock } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -571,7 +571,70 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Location Section */}
+      <section id="location" className="relative py-24 md:py-32 bg-[#0b1a2b] overflow-hidden">
+        {/* Subtle glow effects */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-[100px]"></div>
 
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — Text */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm font-medium mb-8">
+                <MapPinned className="w-4 h-4" />
+                Our Location
+              </span>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-white leading-tight mb-6">
+                Explore the{' '}
+                <span className="text-emerald-400">PRMSU Castillejos Campus</span>
+              </h2>
+              <p className="text-gray-400 text-lg leading-relaxed mb-8 max-w-lg">
+                The PRMSU Castillejos Campus is dedicated to providing quality education closer to the community. Visit us to explore our specialized course offerings and vibrant campus life.
+              </p>
+              <a
+                href="https://www.google.com/maps/place/President+Ramon+Magsaysay+State+University/@14.9309,120.2164,17z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-emerald-400 font-bold text-sm uppercase tracking-wider hover:text-emerald-300 transition-colors group"
+              >
+                Get Directions
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </motion.div>
+
+            {/* Right — Map */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/30">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.5!2d120.2164!3d14.9309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396711dc2b3d5e7%3A0x9a2f0c2c8f1a8b1e!2sPresident%20Ramon%20Magsaysay%20State%20University!5e0!3m2!1sen!2sph!4v1700000000000"
+                  width="100%"
+                  height="400"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="PRMSU Castillejos Campus Map"
+                  className="w-full"
+                ></iframe>
+              </div>
+              {/* Decorative glow behind map */}
+              <div className="absolute -inset-4 -z-10 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 rounded-3xl blur-2xl"></div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 border-t border-gray-800 text-gray-400 py-16">

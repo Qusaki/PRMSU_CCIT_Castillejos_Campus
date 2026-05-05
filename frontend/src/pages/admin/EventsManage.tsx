@@ -303,17 +303,28 @@ export default function EventsManage() {
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="p-5 flex flex-col sm:flex-row gap-4">
-                {/* Images */}
+                {/* Stacked Images */}
                 {event.image_urls && event.image_urls.length > 0 && (
-                  <div className="flex flex-wrap gap-2 flex-shrink-0">
-                    {event.image_urls.map((url, i) => (
-                      <img
-                        key={i}
-                        src={url}
-                        alt={`${event.title} ${i + 1}`}
-                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-contain bg-gray-50 border border-gray-100"
-                      />
-                    ))}
+                  <div className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32">
+                    {/* Background cards (show up to 2 behind) */}
+                    {event.image_urls.length >= 3 && (
+                      <div className="absolute top-2 left-2 w-full h-full rounded-lg bg-gray-200 border border-gray-300 rotate-3"></div>
+                    )}
+                    {event.image_urls.length >= 2 && (
+                      <div className="absolute top-1 left-1 w-full h-full rounded-lg overflow-hidden border border-gray-200 -rotate-2 shadow-sm">
+                        <img src={event.image_urls[1]} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    {/* Front card */}
+                    <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-white shadow-md">
+                      <img src={event.image_urls[0]} alt={event.title} className="w-full h-full object-cover" />
+                    </div>
+                    {/* Count badge */}
+                    {event.image_urls.length > 1 && (
+                      <span className="absolute -bottom-1.5 -right-1.5 bg-prmsu-maroon text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+                        {event.image_urls.length}
+                      </span>
+                    )}
                   </div>
                 )}
 
