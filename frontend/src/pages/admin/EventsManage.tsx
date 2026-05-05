@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Calendar, Plus, Trash2, X, MapPin, Clock, Loader2, ImagePlus, AlertCircle } from 'lucide-react';
 
@@ -16,7 +17,8 @@ interface EventItem {
 }
 
 export default function EventsManage() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
+  const navigate = useNavigate();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -109,6 +111,9 @@ export default function EventsManage() {
       if (res.ok) {
         resetForm();
         fetchEvents();
+      } else if (res.status === 401) {
+        logout();
+        navigate('/admin/login');
       } else {
         const data = await res.json();
         setError(data.detail || 'Failed to create event.');
@@ -131,6 +136,9 @@ export default function EventsManage() {
       });
       if (res.ok) {
         setEvents((prev) => prev.filter((e) => e.id !== id));
+      } else if (res.status === 401) {
+        logout();
+        navigate('/admin/login');
       }
     } catch (err) {
       console.error('Failed to delete event:', err);

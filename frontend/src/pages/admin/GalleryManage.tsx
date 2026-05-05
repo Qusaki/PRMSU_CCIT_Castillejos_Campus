@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Image as ImageIcon, Plus, Trash2, X, Loader2, Upload, AlertCircle } from 'lucide-react';
 
@@ -12,7 +13,8 @@ interface GalleryItem {
 }
 
 export default function GalleryManage() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
+  const navigate = useNavigate();
   const [images, setImages] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -91,6 +93,9 @@ export default function GalleryManage() {
       if (res.ok) {
         resetForm();
         fetchImages();
+      } else if (res.status === 401) {
+        logout();
+        navigate('/admin/login');
       } else {
         const data = await res.json();
         setError(data.detail || 'Failed to upload images.');
@@ -113,6 +118,9 @@ export default function GalleryManage() {
       });
       if (res.ok) {
         setImages((prev) => prev.filter((img) => img.id !== id));
+      } else if (res.status === 401) {
+        logout();
+        navigate('/admin/login');
       }
     } catch (err) {
       console.error('Failed to delete image:', err);
