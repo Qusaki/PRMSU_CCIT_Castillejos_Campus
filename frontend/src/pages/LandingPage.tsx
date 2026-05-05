@@ -618,7 +618,7 @@ export default function LandingPage() {
             >
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/30">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.5!2d120.2164!3d14.9309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396711dc2b3d5e7%3A0x9a2f0c2c8f1a8b1e!2sPresident%20Ramon%20Magsaysay%20State%20University!5e0!3m2!1sen!2sph!4v1700000000000"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3855.402454314796!2d120.19522808088601!3d14.914654953806169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x339679f962c794c9%3A0x794784a72428c0c5!2sPRESIDENT%20RAMON%20MAGSAYSAY%20STATE%20UNIVERSITY!5e0!3m2!1sen!2sph!4v1777962516257!5m2!1sen!2sph"
                   width="100%"
                   height="400"
                   style={{ border: 0 }}
