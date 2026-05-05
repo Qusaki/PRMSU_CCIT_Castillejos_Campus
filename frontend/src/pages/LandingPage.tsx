@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
+import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, MapPin, Clock } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -12,13 +12,6 @@ interface EventItem {
   event_date: string;
   venue: string;
   image_urls: string[];
-}
-
-interface GalleryItem {
-  id: number;
-  filename: string;
-  file_url: string;
-  created_at: string;
 }
 
 function EventImageSlider({ images, title, heightClass = 'h-64 md:h-80' }: { images: string[]; title: string; heightClass?: string }) {
@@ -83,8 +76,7 @@ export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [galleryImages, setGalleryImages] = useState<GalleryItem[]>([]);
-  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,7 +88,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/events/`).then(r => r.json()).then(setEvents).catch(() => {});
-    fetch(`${API_BASE_URL}/api/gallery/`).then(r => r.json()).then(setGalleryImages).catch(() => {});
+
   }, []);
 
   const programs = [
@@ -132,7 +124,7 @@ export default function LandingPage() {
               <a href="#about" className="text-text-light hover:text-prmsu-maroon relative py-1 font-bold text-sm uppercase tracking-wide transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-prmsu-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">About CCIT</a>
               <a href="#programs" className="text-text-light hover:text-prmsu-maroon relative py-1 font-bold text-sm uppercase tracking-wide transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-prmsu-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">We Offer</a>
               <a href="#events" className="text-text-light hover:text-prmsu-maroon relative py-1 font-bold text-sm uppercase tracking-wide transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-prmsu-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">Events</a>
-              <a href="#gallery" className="text-text-light hover:text-prmsu-maroon relative py-1 font-bold text-sm uppercase tracking-wide transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-prmsu-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">Gallery</a>
+
             </div>
 
             {/* Mobile menu button */}
@@ -162,7 +154,7 @@ export default function LandingPage() {
               <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="inline-block text-xl font-display font-bold text-prmsu-dark hover:text-prmsu-maroon hover:translate-x-2 transition-all duration-300">About CCIT</a>
               <a href="#programs" onClick={() => setIsMobileMenuOpen(false)} className="inline-block text-xl font-display font-bold text-prmsu-dark hover:text-prmsu-maroon hover:translate-x-2 transition-all duration-300">We Offer</a>
               <a href="#events" onClick={() => setIsMobileMenuOpen(false)} className="inline-block text-xl font-display font-bold text-prmsu-dark hover:text-prmsu-maroon hover:translate-x-2 transition-all duration-300">Events</a>
-              <a href="#gallery" onClick={() => setIsMobileMenuOpen(false)} className="inline-block text-xl font-display font-bold text-prmsu-dark hover:text-prmsu-maroon hover:translate-x-2 transition-all duration-300">Gallery</a>
+
             </div>
           </motion.div>
         )}
@@ -579,70 +571,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <section id="gallery" className="py-24 bg-gray-50 relative overflow-hidden">
-        <div className="absolute bottom-10 left-10 w-80 h-80 bg-prmsu-maroon/5 rounded-full blur-[100px]"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-              <h2 className="text-prmsu-gold font-bold tracking-wider text-sm uppercase mb-3">Campus Life</h2>
-              <h3 className="text-4xl md:text-5xl font-display font-bold text-prmsu-dark">Photo Gallery</h3>
-            </motion.div>
-          </div>
 
-          {galleryImages.length === 0 ? (
-            <div className="text-center py-16">
-              <ImageIcon className="w-14 h-14 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg">No gallery images yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {galleryImages.map((img, idx) => (
-                <motion.div
-                  key={img.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
-                  onClick={() => setLightboxUrl(img.file_url)}
-                >
-                  <img src={img.file_url} alt={img.filename} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxUrl && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
-            onClick={() => setLightboxUrl(null)}
-          >
-            <button className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors z-10" onClick={() => setLightboxUrl(null)}>
-              <X className="w-8 h-8" />
-            </button>
-            <motion.img
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              src={lightboxUrl}
-              alt="Full view"
-              className="max-w-full max-h-[85vh] rounded-xl shadow-2xl object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Footer */}
       <footer className="bg-gray-900 border-t border-gray-800 text-gray-400 py-16">

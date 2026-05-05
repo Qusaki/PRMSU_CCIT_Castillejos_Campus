@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Calendar, Image as ImageIcon, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout() {
@@ -23,7 +23,6 @@ export default function AdminLayout() {
   const navItems = [
     { path: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { path: '/admin/events', label: 'Events', icon: <Calendar className="w-5 h-5" /> },
-    { path: '/admin/gallery', label: 'Gallery', icon: <ImageIcon className="w-5 h-5" /> },
   ];
 
   return (
