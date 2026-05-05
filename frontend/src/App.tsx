@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 
 // Public Pages
 import LandingPage from './pages/LandingPage';
+import EventsPage from './pages/EventsPage';
 
 // Admin Pages
 import AdminLayout from './components/admin/AdminLayout';
@@ -16,8 +17,9 @@ export default function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Route */}
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/events" element={<EventsPage />} />
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<Login />} />

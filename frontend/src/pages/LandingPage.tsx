@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, ChevronLeft, ChevronRight, Monitor, Code, BookOpen, GraduationCap, ArrowRight, User, Eye, Target, Award, Calendar, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 
@@ -515,7 +516,7 @@ export default function LandingPage() {
             </div>
           ) : (
             <div className="space-y-20">
-              {events.slice(0, 6).map((event, idx) => (
+              {events.slice(0, 3).map((event, idx) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 40 }}
@@ -560,6 +561,19 @@ export default function LandingPage() {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          )}
+
+          {/* View All Events button */}
+          {events.length > 3 && (
+            <div className="text-center mt-16">
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-prmsu-maroon text-white rounded-xl font-semibold hover:bg-[#115029] transition-all shadow-md hover:shadow-lg group"
+              >
+                View All Events ({events.length})
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           )}
         </div>
